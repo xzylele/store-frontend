@@ -57,7 +57,7 @@ export default function LoginPage() {
           
           <div className="text-center mb-10">
             <h1 className="text-4xl font-black text-black leading-none mb-4 tracking-tighter uppercase">SIGN IN</h1>
-            <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-8Opacity-80">Welcome back. Enter your details below.</p>
+            
             <div className="h-1 w-20 bg-[#007AFF] mx-auto"></div>
           </div>
           
@@ -79,7 +79,7 @@ export default function LoginPage() {
           </form>
           
           <div className="mt-10 pt-10 border-t border-gray-100 text-center">
-            <p className="text-[11px] font-black uppercase text-gray-400 mb-2">โค้ดที่มีอยู่</p>
+            
             <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">
               ยังไม่มีบัญชี? <Link href="/register" className="text-[#007AFF] font-black hover:underline uppercase text-xs">สร้างบัญชีใหม่</Link>
             </p>

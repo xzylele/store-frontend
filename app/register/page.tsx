@@ -50,8 +50,7 @@ export default function RegisterPage() {
           
           <div className="text-center mb-10">
             <h1 className="text-4xl font-black text-black leading-none mb-4 tracking-tighter uppercase">SIGN UP</h1>
-            <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-8Opacity-80">Create your account to get started.</p>
-            <div className="h-1 w-20 bg-[#007AFF] mx-auto"></div>
+            
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -77,7 +76,7 @@ export default function RegisterPage() {
           </form>
           
           <div className="mt-10 pt-10 border-t border-gray-100 text-center">
-            <p className="text-[11px] font-black uppercase text-gray-400 mb-2">โค้ดที่มีอยู่</p>
+            
             <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">
               มีบัญชีอยู่แล้ว? <Link href="/login" className="text-[#007AFF] font-black hover:underline uppercase text-xs">เข้าสู่ระบบ</Link>
             </p>
