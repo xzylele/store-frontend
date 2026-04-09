@@ -24,3 +24,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+/* ดัดแปลงหน้าตา SweetAlert2 ให้เข้ากับธีม High Contrast */
+.swal2-popup {
+  border-radius: 20px !important; /* บังคับโค้ง 20px */
+  border: 2px solid #e5e7eb !important; /* เพิ่มขอบให้ชัดเจนมองง่าย */
+  font-family: inherit !important;
+}
+
+.swal2-title {
+  font-weight: 900 !important; /* font-black ตามธีมคุณ */
+  color: #1C1C1E !important;
+}
+
+.swal2-confirm, .swal2-cancel {
+  border-radius: 12px !important; /* ปุ่มข้างในให้โค้งมน */
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
