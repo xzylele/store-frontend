@@ -134,6 +134,32 @@ export default function AdminPage() {
     fetchData();
   };
 
+  // 🟢 ฟังก์ชันใหม่: ดูสลิปและที่อยู่ (Order Info)
+  const viewOrderInfo = (order: any) => {
+    Swal.fire({
+      title: `<div class="text-left"><p class="text-[10px] font-black text-[#007AFF] uppercase mb-1">Order Info</p><p class="text-xl font-black uppercase">การชำระเงินและที่อยู่</p></div>`,
+      html: `
+        <div class="text-left space-y-5 p-2">
+          <div class="bg-gray-50 p-4 rounded-3xl border-2 border-dashed border-gray-200 text-center">
+             <p class="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">หลักฐานการโอน (Payment Slip)</p>
+             ${order.paymentProof ? `<img src="${order.paymentProof}" class="w-full max-w-[200px] mx-auto rounded-xl shadow-lg cursor-pointer" onclick="window.open('${order.paymentProof}')" />` : `<p class="py-5 text-gray-300 font-bold uppercase text-[10px]">ยังไม่แนบสลิป</p>`}
+          </div>
+          <div class="bg-white p-5 rounded-3xl border-2 border-gray-100">
+             <p class="text-[10px] font-black uppercase text-[#007AFF] mb-3 tracking-widest">ที่อยู่จัดส่ง (Shipping)</p>
+             ${order.shippingAddress ? `
+                <p class="text-sm font-black">${order.shippingAddress.fullName}</p>
+                <p class="text-xs text-gray-600">โทร: ${order.shippingAddress.phone}</p>
+                <p class="text-xs text-gray-500 mt-2">${order.shippingAddress.addressLine}, ${order.shippingAddress.district}, ${order.shippingAddress.province} ${order.shippingAddress.zipCode}</p>
+             ` : `<p class="text-xs text-red-400">ไม่มีข้อมูลที่อยู่</p>`}
+          </div>
+        </div>
+      `,
+      confirmButtonText: 'รับทราบ',
+      confirmButtonColor: '#000',
+      customClass: { popup: 'rounded-[2.5rem]' }
+    });
+  };
+
   const handleCouponSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const dataToSend = { ...couponForm, usageLimit: couponForm.usageLimit === 0 ? null : couponForm.usageLimit };
@@ -155,7 +181,7 @@ export default function AdminPage() {
     }
   };
 
-  // 🟢 ฟังก์ชันดูรายละเอียดลูกค้าแบบเจาะลึก (รวมรายการสินค้า สี และจำนวน)
+  // 🟢 ฟังก์ชันดูรายละเอียดลูกค้า (Order History)
   const viewCustomerDetail = (username: string) => {
     const customerOrders = salesData.orders.filter((o: any) => o.username === username);
     const totalSpent = customerOrders.reduce((sum: number, o: any) => sum + o.totalAmount, 0);
@@ -172,7 +198,6 @@ export default function AdminPage() {
              <p class="text-4xl font-black italic">฿${totalSpent.toLocaleString()}</p>
              <p class="text-[10px] font-bold text-blue-400 mt-2 uppercase">Total: ${customerOrders.length} Orders</p>
           </div>
-
           <div>
             <p class="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest pl-2">Detailed History</p>
             <div class="max-h-[350px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
@@ -182,7 +207,6 @@ export default function AdminPage() {
                     <span class="text-[10px] font-black text-gray-400 uppercase">${new Date(o.createdAt).toLocaleDateString()}</span>
                     <span class="text-[8px] font-black uppercase px-2 py-1 rounded-md ${o.status === 'Delivered' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}">${o.status}</span>
                   </div>
-                  
                   <div class="space-y-2">
                     ${o.items.map((item: any) => `
                       <div class="flex justify-between items-center bg-gray-50 p-2 rounded-xl">
@@ -197,7 +221,6 @@ export default function AdminPage() {
                       </div>
                     `).join('')}
                   </div>
-
                   <div class="mt-3 pt-2 border-t border-dashed flex justify-between items-center">
                     <span class="text-[9px] font-black text-gray-400 uppercase">Grand Total</span>
                     <span class="text-sm font-black text-[#007AFF]">฿${o.totalAmount.toLocaleString()}</span>
@@ -292,24 +315,13 @@ export default function AdminPage() {
             <section className="bg-white rounded-3xl border-2 border-gray-200 overflow-hidden shadow-sm">
               <table className="w-full text-left">
                 <thead className="bg-gray-50 border-b-2 border-gray-200 text-[10px] font-black uppercase text-gray-400">
-                    <tr>
-                        <th className="p-5">Device</th>
-                        <th className="p-5 text-center">Colors</th>
-                        <th className="p-5 text-center">Total Stock</th>
-                        <th className="p-5 text-right">Price</th>
-                        <th className="p-5 text-center">Action</th>
-                    </tr>
+                    <tr><th className="p-5">Device</th><th className="p-5 text-center">Colors</th><th className="p-5 text-center">Total Stock</th><th className="p-5 text-right">Price</th><th className="p-5 text-center">Action</th></tr>
                 </thead>
                 <tbody className="text-xs font-bold text-gray-600">
                   {phones.map((p) => (
                     <tr key={p._id} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="p-5 flex items-center gap-4">
-                            <img src={p.image} className="w-10 h-10 object-contain rounded-lg" />
-                            <span className="uppercase">{p.name}</span>
-                        </td>
-                        <td className="p-5 text-center">
-                           <span className="bg-blue-50 text-[#007AFF] text-[9px] font-black px-2 py-1 rounded-full uppercase">{p.variants?.length || 0} สี</span>
-                        </td>
+                        <td className="p-5 flex items-center gap-4"><img src={p.image} className="w-10 h-10 object-contain rounded-lg" /><span className="uppercase">{p.name}</span></td>
+                        <td className="p-5 text-center"><span className="bg-blue-50 text-[#007AFF] text-[9px] font-black px-2 py-1 rounded-full uppercase">{p.variants?.length || 0} สี</span></td>
                         <td className="p-5 text-center font-black text-[#1C1C1E]">{p.stock}</td>
                         <td className="p-5 text-right font-black text-black">฿{p.price.toLocaleString()}</td>
                         <td className="p-5 text-center space-x-3">
@@ -323,43 +335,35 @@ export default function AdminPage() {
           </div>
 
           <div className="space-y-10">
-             {/* 📜 Recent Sales Feed - อัปเกรดใหม่โชว์รูปและสินค้า */}
+             {/* 📜 Recent Sales Feed - รวมร่างโชว์รูปและที่อยู่ */}
              <section className="bg-white p-6 rounded-[2rem] border-2 border-gray-200 shadow-sm">
-                <h2 className="text-sm font-black mb-6 uppercase tracking-widest text-[#007AFF] border-b pb-2">Recent Sales Feed</h2>
+                <h2 className="text-sm font-black mb-6 uppercase tracking-widest text-[#007AFF] border-b pb-2">Recent Sales</h2>
                 <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                   {salesData.orders?.slice(0, 10).map((order: any) => (
                     <div key={order._id} className="pb-6 border-b last:border-0 border-gray-100 group">
                       <div className="flex justify-between items-start mb-3">
-                        <div>
+                        <div onClick={() => viewOrderInfo(order)} className="cursor-pointer hover:opacity-70 transition-all">
                           <p className="text-sm font-black text-black leading-none mb-1">฿{order.totalAmount.toLocaleString()}</p>
                           <p className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">
-                            {order.username} • {new Date(order.createdAt).toLocaleDateString()}
+                            {order.username} • <span className="text-[#007AFF]">ดูสลิป/ที่อยู่ →</span>
                           </p>
                         </div>
                         <select 
                           value={order.status} 
                           onChange={(e) => updateOrderStatus(order._id, e.target.value)} 
-                          className={`text-[8px] font-black uppercase p-1.5 rounded-lg border-2 outline-none transition-all cursor-pointer
+                          className={`text-[8px] font-black uppercase p-1.5 rounded-lg border-2 outline-none cursor-pointer
                             ${order.status === 'Pending' ? 'bg-orange-50 border-orange-200 text-orange-600' : ''} 
                             ${order.status === 'Shipping' ? 'bg-blue-50 border-blue-200 text-blue-600' : ''} 
-                            ${order.status === 'Delivered' ? 'bg-green-50 border-green-200 text-green-600' : ''} 
-                            ${order.status === 'Cancelled' ? 'bg-red-50 border-red-200 text-red-600' : ''}`}
+                            ${order.status === 'Delivered' ? 'bg-green-50 border-green-200 text-green-600' : ''}`}
                         >
                           {['Pending', 'Shipping', 'Delivered', 'Cancelled'].map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </div>
-
-                      {/* 🛍️ รายการสินค้าตัวเล็กๆ ในออเดอร์นั้น */}
                       <div className="flex flex-wrap gap-2">
                         {order.items.map((item: any, idx: number) => (
                           <div key={idx} className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-100 pr-3">
-                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1 border border-gray-200 shadow-sm">
-                              <img src={item.image} alt="" className="w-full h-full object-contain" />
-                            </div>
-                            <div>
-                              <p className="text-[9px] font-black text-gray-800 leading-tight truncate max-w-[100px]">{item.name}</p>
-                              <p className="text-[8px] font-bold text-[#007AFF] uppercase">x{item.quantity}</p>
-                            </div>
+                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1 border border-gray-200 shadow-sm"><img src={item.image} alt="" className="w-full h-full object-contain" /></div>
+                            <div><p className="text-[9px] font-black text-gray-800 leading-tight truncate max-w-[100px]">{item.name}</p><p className="text-[8px] font-bold text-[#007AFF] uppercase">x{item.quantity}</p></div>
                           </div>
                         ))}
                       </div>
@@ -370,36 +374,22 @@ export default function AdminPage() {
 
              {/* 🎫 Coupon Logic */}
              <section className="bg-white p-6 rounded-[2rem] border-2 border-gray-200 shadow-sm border-t-4 border-t-black">
-                <h2 className="text-sm font-black mb-4 uppercase tracking-widest">🎫 Voucher Management</h2>
+                <h2 className="text-sm font-black mb-4 uppercase tracking-widest">🎫 Voucher</h2>
                 <form onSubmit={handleCouponSubmit} className="space-y-3 mb-6">
-                   <input type="text" placeholder="CODE" value={couponForm.code} className="w-full border-2 p-2 rounded-xl text-xs font-bold uppercase outline-none focus:border-black" onChange={e => setCouponForm({...couponForm, code: e.target.value.toUpperCase()})} required />
+                   <input type="text" placeholder="CODE" value={couponForm.code} className="w-full border-2 p-2 rounded-xl text-xs font-bold uppercase outline-none" onChange={e => setCouponForm({...couponForm, code: e.target.value.toUpperCase()})} required />
                    <div className="grid grid-cols-2 gap-2">
-                      <select className="border-2 p-2 rounded-xl text-[10px] font-bold" value={couponForm.discountType} onChange={e => setCouponForm({...couponForm, discountType: e.target.value})}>
-                         <option value="percentage">% Percentage</option>
-                         <option value="fixed">฿ Fixed Amount</option>
-                      </select>
-                      <input type="number" placeholder="Value" value={couponForm.discountValue || ""} className="border-2 p-2 rounded-xl text-xs font-bold outline-none focus:border-black" onChange={e => setCouponForm({...couponForm, discountValue: parseInt(e.target.value) || 0})} required />
+                      <select className="border-2 p-2 rounded-xl text-[10px] font-bold" value={couponForm.discountType} onChange={e => setCouponForm({...couponForm, discountType: e.target.value})}><option value="percentage">% Percent</option><option value="fixed">฿ Fixed</option></select>
+                      <input type="number" placeholder="ค่าลด" value={couponForm.discountValue || ""} className="border-2 p-2 rounded-xl text-xs font-bold" onChange={e => setCouponForm({...couponForm, discountValue: parseInt(e.target.value) || 0})} required />
                    </div>
-                   <div>
-                     <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">Usage Limit (0 = ∞)</label>
-                     <input type="number" placeholder="Max uses" value={couponForm.usageLimit || ""} className="w-full border-2 p-2 rounded-xl text-xs font-bold outline-none focus:border-black" onChange={e => setCouponForm({...couponForm, usageLimit: parseInt(e.target.value) || 0})} />
-                   </div>
-                   <button type="submit" className="w-full bg-black text-white py-3 rounded-xl font-black uppercase text-[10px] hover:bg-[#007AFF] transition-all">Create Coupon</button>
+                   <input type="number" placeholder="Usage Limit (0 = ∞)" value={couponForm.usageLimit || ""} className="w-full border-2 p-2 rounded-xl text-xs font-bold" onChange={e => setCouponForm({...couponForm, usageLimit: parseInt(e.target.value) || 0})} />
+                   <button type="submit" className="w-full bg-black text-white py-3 rounded-xl font-black uppercase text-[10px] hover:bg-[#007AFF]">สร้างคูปอง</button>
                 </form>
                 <div className="max-h-48 overflow-y-auto space-y-3">
                    {coupons.map(cp => (
-                      <div key={cp._id} className="p-3 bg-gray-50 rounded-2xl border border-gray-200 shadow-sm">
-                         <div className="flex justify-between items-center mb-2">
-                            <span className="font-black text-xs uppercase text-[#007AFF]">{cp.code}</span>
-                            <button onClick={() => deleteCoupon(cp._id)} className="text-red-400 text-[10px] font-bold hover:text-red-600 transition-colors">Del</button>
-                         </div>
-                         <div className="flex justify-between text-[9px] font-bold text-gray-500 uppercase tracking-tighter">
-                            <span>ลด: {cp.discountValue}${cp.discountType === 'percentage' ? '%' : '฿'}</span>
-                            <span>ใช้: {cp.usageCount} / ${cp.usageLimit || '∞'}</span>
-                         </div>
-                         <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden shadow-inner">
-                            <div className="bg-[#007AFF] h-full transition-all duration-700" style={{ width: `${cp.usageLimit ? Math.min((cp.usageCount / cp.usageLimit) * 100, 100) : 0}%` }}></div>
-                         </div>
+                      <div key={cp._id} className="p-3 bg-gray-50 rounded-2xl border border-gray-200 shadow-inner">
+                         <div className="flex justify-between items-center mb-2"><span className="font-black text-xs uppercase text-[#007AFF]">{cp.code}</span><button onClick={() => deleteCoupon(cp._id)} className="text-red-400 text-[10px]">Del</button></div>
+                         <div className="flex justify-between text-[9px] font-bold text-gray-500 uppercase"><span>ลด: {cp.discountValue}${cp.discountType === 'percentage' ? '%' : '฿'}</span><span>ใช้: {cp.usageCount} / ${cp.usageLimit || '∞'}</span></div>
+                         <div className="w-full bg-gray-200 h-1 rounded-full mt-2 overflow-hidden"><div className="bg-[#007AFF] h-full" style={{ width: `${cp.usageLimit ? Math.min((cp.usageCount / cp.usageLimit) * 100, 100) : 0}%` }}></div></div>
                       </div>
                    ))}
                 </div>
@@ -407,19 +397,12 @@ export default function AdminPage() {
 
              {/* 👥 Member History System */}
              <section className="bg-white p-6 rounded-[2rem] border-2 border-gray-200 shadow-sm">
-                <h2 className="text-sm font-black mb-4 uppercase tracking-widest text-[#007AFF]">👥 Customer Insight</h2>
+                <h2 className="text-sm font-black mb-4 uppercase tracking-widest text-[#007AFF]">👥 Insight</h2>
                 <div className="max-h-60 overflow-y-auto space-y-2">
                   {users.map((u: any) => (
-                    <div 
-                      key={u._id} 
-                      onClick={() => viewCustomerDetail(u.username)}
-                      className="flex justify-between items-center py-2 px-3 border border-transparent hover:border-blue-200 hover:bg-blue-50 rounded-xl cursor-pointer transition-all group shadow-sm bg-gray-50"
-                    >
-                      <div>
-                        <p className="text-[11px] font-black uppercase text-black leading-none mb-1">{u.username}</p>
-                        <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{u.role}</p>
-                      </div>
-                      <span className="text-[8px] opacity-0 group-hover:opacity-100 text-[#007AFF] font-black uppercase transition-all bg-white px-2 py-1 rounded-lg border border-blue-100 shadow-sm">View History →</span>
+                    <div key={u._id} onClick={() => viewCustomerDetail(u.username)} className="flex justify-between items-center py-2 px-3 border border-transparent hover:border-blue-200 hover:bg-blue-50 rounded-xl cursor-pointer transition-all group bg-gray-50 shadow-sm">
+                      <div><p className="text-[11px] font-black uppercase text-black mb-1">{u.username}</p><p className="text-[8px] font-bold text-gray-400 uppercase">{u.role}</p></div>
+                      <span className="text-[8px] opacity-0 group-hover:opacity-100 text-[#007AFF] font-black uppercase">History →</span>
                     </div>
                   ))}
                 </div>
